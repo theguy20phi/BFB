@@ -11,6 +11,7 @@ class Rollers {
   void intake();
   void outtake();
   void shoot();
+  void shoot_until_empty();
   void shoot_and_outtake();
   void cycle();
   void intake_one_ball();
