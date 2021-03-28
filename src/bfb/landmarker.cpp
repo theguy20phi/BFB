@@ -1,6 +1,6 @@
 #include "landmarker.hpp"
 
-// NOTE Using a point procedure from a pose object may cause issues
+// TODO Using a point procedure from a pose object may cause issues
 
 namespace bfb {
 LineLandmarker::LineLandmarker(const std::vector<LineSegment> &i_line_segments,
@@ -104,7 +104,7 @@ Point GoalLandmarker::get_closest_point(const Pose &current, const Circle &close
   const okapi::QLength y{closest_goal.center.y +
                          closest_goal.radius *
                            (y_diff / okapi::sqrt(x_diff * x_diff + y_diff * y_diff))};
-  // NOTE May have conflicts with how straight forward = 0 deg.
+  // TODO May have conflicts with how straight forward = 0 deg.
   const okapi::QAngle h{okapi::atan2(closest_goal.center.y - y, closest_goal.center.x - x)};
   return Point{x, y, h};
 }

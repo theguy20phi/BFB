@@ -1,13 +1,10 @@
 #pragma once
 
-#include "okapi/api/control/util/settledUtil.hpp"
-#include "okapi/api/units/QAngle.hpp"
-#include "okapi/api/units/QLength.hpp"
-#include "okapi/api/units/QSpeed.hpp"
-#include "okapi/impl/util/timeUtilFactory.hpp"
+#include "okapi/api.hpp"
 #include <memory>
 
 using namespace okapi::literals;
+
 namespace bfb {
 using SettledUtilPtr = std::unique_ptr<okapi::SettledUtil>;
 SettledUtilPtr make_settled_util(double i_max_error = 50,
@@ -17,10 +14,21 @@ SettledUtilPtr make_settled_util(double i_max_error = 50,
 enum class Color { Blue, Red };
 
 constexpr okapi::QSpeed inps = okapi::inch / okapi::second;
+constexpr okapi::QAcceleration inpsps = okapi::inch / (okapi::second * okapi::second);
+constexpr okapi::QAngularAcceleration radpsps = okapi::radian / (okapi::second * okapi::second);
 
 inline namespace literals {
-constexpr okapi::QSpeed _inps(long double x) {
+constexpr okapi::QSpeed operator""_inps(long double x) {
   return x * inps;
+}
+constexpr okapi::QAcceleration operator""_inpsps(long double x) {
+  return x * inpsps;
+}
+constexpr okapi::QAngularSpeed operator""_radps(long double x) {
+  return x * okapi::radps;
+}
+constexpr okapi::QAngularAcceleration operator""_radpsps(long double x) {
+  return x * radpsps;
 }
 constexpr okapi::QLength operator""_tile(long double x) {
   return x * 24.0 * okapi::inch;

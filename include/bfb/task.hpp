@@ -9,7 +9,7 @@ class Task {
   public:
   Task(std::uint32_t iPriority = TASK_PRIORITY_DEFAULT);
 
-  virtual void step();
+  virtual void task_fn();
   virtual void start() final;
   virtual void stop() final;
 

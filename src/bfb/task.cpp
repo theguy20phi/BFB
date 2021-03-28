@@ -4,15 +4,13 @@ namespace bfb {
 Task::Task(std::uint32_t iPriority) : priority(iPriority) {
 }
 
-void Task::step() {
+void Task::task_fn() {
 }
 
 void Task::start() {
   task = std::make_unique<pros::Task>(
     [this]() {
-      for (;;) {
-        this->step();
-      }
+      this->task_fn();
     },
     "BFB TASK");
 }
