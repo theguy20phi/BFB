@@ -1,6 +1,7 @@
 #pragma once
 
 #include "api.h"
+#include "values.hpp"
 #include "wait.hpp"
 
 namespace bfb {
@@ -28,11 +29,15 @@ class Rollers {
   const int threshold{2750};
   double power{600};
   bool shooting{true};
-  pros::ADIAnalogIn upper_indexer{'A'};
-  pros::ADIAnalogIn lower_indexer{'B'};
-  pros::Motor lower_shooter{10, pros::motor_gearset_e_t::E_MOTOR_GEARSET_06, false};
-  pros::Motor upper_shooter{9, pros::motor_gearset_e_t::E_MOTOR_GEARSET_06, false};
-  pros::Motor left_side{1, pros::motor_gearset_e_t::E_MOTOR_GEARSET_06, false};
-  pros::Motor right_side{8, pros::motor_gearset_e_t::E_MOTOR_GEARSET_06, true};
+  pros::ADIAnalogIn upper_indexer{port::upper_line_tracker};
+  pros::ADIAnalogIn lower_indexer{port::lower_line_tracker};
+  pros::Motor lower_shooter{port::l_shooter_motor,
+                            pros::motor_gearset_e_t::E_MOTOR_GEARSET_06,
+                            false};
+  pros::Motor upper_shooter{port::u_shooter_motor,
+                            pros::motor_gearset_e_t::E_MOTOR_GEARSET_06,
+                            false};
+  pros::Motor left_side{port::l_side_motor, pros::motor_gearset_e_t::E_MOTOR_GEARSET_06, false};
+  pros::Motor right_side{port::r_side_motor, pros::motor_gearset_e_t::E_MOTOR_GEARSET_06, true};
 };
 } // namespace bfb
