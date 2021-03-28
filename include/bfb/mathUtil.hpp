@@ -17,6 +17,10 @@ template <typename T> T clamp(const T &value, const Range<T> range) {
   return value;
 }
 
+template <typename T> bool is_between(const T &value, const T &lower, const T &upper) {
+  return (value < upper && value > lower) || (value < lower && value > upper);
+}
+
 bool is_almost_equal(double a, double b, double thresh);
 bool is_almost_zero(double a, double thresh);
 
