@@ -6,7 +6,6 @@
 #include "api.h"
 #include "okapi/api.hpp"
 #include "bfb/bfb.hpp"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

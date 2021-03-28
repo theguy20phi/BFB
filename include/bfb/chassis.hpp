@@ -81,14 +81,16 @@ class Chassis : public Task {
      {{0.0_tile, 3.0_tile + 1.0_in}, {6.0_tile, 3.0_tile + 1.0_in}},
      {{0.0_tile, 5.0_tile + 1.0_in}, {6.0_tile, 5.0_tile + 1.0_in}}},
     {{{2.5_tile, 1.5_tile}, {3.5_tile, 0.0_tile}}, {{2.5_tile, 4.5_tile}, {3.5_tile, 6.0_tile}}}};
-  GoalLandmarker goal_landmarker{{{{3.0_tile, 3.0_tile}, 5.65_in},
-                                  {{5.65_in, 5.65_in}, 5.65_in},
-                                  {{3.0_tile, 5.65_in}, 5.65_in},
-                                  {{6.0_tile - 5.65_in, 5.65_in}, 5.65_in},
+  // TODO 9.0_in should be replaced with actual distance from front to center.
+  static constexpr okapi::QLength goal_radius{5.65_in + 9.0_in};
+  GoalLandmarker goal_landmarker{{{{3.0_tile, 3.0_tile}, goal_radius},
+                                  {{5.65_in, 5.65_in}, goal_radius},
+                                  {{3.0_tile, 5.65_in}, goal_radius},
+                                  {{6.0_tile - 5.65_in, 5.65_in}, goal_radius},
                                   {{5.65_in, 3.0_tile}, 5.65_in},
-                                  {{6.0_tile - 5.65_in, 3.0_tile}, 5.65_in},
-                                  {{5.65_in, 6.0_tile - 5.65_in}, 5.65_in},
-                                  {{3.0_tile, 6.0_tile - 5.65_in}, 5.65_in},
-                                  {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, 5.65_in}}};
+                                  {{6.0_tile - 5.65_in, 3.0_tile}, goal_radius},
+                                  {{5.65_in, 6.0_tile - 5.65_in}, goal_radius},
+                                  {{3.0_tile, 6.0_tile - 5.65_in}, goal_radius},
+                                  {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}}};
 };
 } // namespace bfb

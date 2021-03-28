@@ -9,7 +9,7 @@ Chassis::Chassis() {
 void Chassis::task_fn() {
   for (pros::Imu imu : imus)
     imu.reset();
-  bfb::wait(3000 * imus.size());
+  bfb::wait(3000 * imus.size()); // Takes about three seconds for an IMU to calibrate.
   for (;;) {
     okapi::QAngle imu_reading{0.0_deg};
     for (pros::Imu imu : imus)
@@ -51,7 +51,7 @@ void Chassis::task_fn() {
     pose = goal_landmarker.correct_position(pose, goal_limit_switch.get_value());
     previous_time = time;
     previous_pose = pose;
-    wait(10);
+    wait(general_delay);
   }
 }
 
@@ -76,15 +76,12 @@ void Chassis::move_to(const std::vector<Pose> &targets,
     do {
       const okapi::QLength lateral_distance{-pose.distance_to(target)};
       const okapi::QAngle angular_distance(-okapi::OdomMath::constrainAngle180(target.h - pose.h));
+      // TODO If something seems strange here, consider changing target.w to 0, for some reason...
       auto angular_target = angular_profiler.next_target(
         {angular_distance, pose.w}, {0.0_deg, target.w}, max_angular_vel, max_angular_accel);
-      // TODO May need to change what max velocity equation is.
+      // TODO May need to change what max velocity equation is. Now may need to add it back.
       auto lateral_target = lateral_profiler.next_target(
-        {lateral_distance, pose.v},
-        {0.0_in, target.v},
-        max_lateral_vel -
-          max_lateral_vel * (angular_target.v / (curvature_constraint * max_angular_vel)),
-        max_lateral_accel);
+        {lateral_distance, pose.v}, {0.0_in, target.v}, max_lateral_vel, max_lateral_accel);
       lateral_pos_pid.calculate(lateral_distance.convert(okapi::inch));
       angular_pos_pid.calculate(angular_distance.convert(okapi::radian));
       lateral_vel_pid.set_target(pose.v.convert(inps), lateral_target.v.convert(inps));
@@ -99,7 +96,7 @@ void Chassis::move_to(const std::vector<Pose> &targets,
                                    angular_kv * angular_target.v.convert(okapi::radps) +
                                    angular_ka * angular_target.a.convert(radpsps));
       drive_toward(target, lateral_command, angular_command);
-      wait(10);
+      wait(general_delay);
     } while (
       !lateral_profiler.is_at_target({pose.distance_to(target), pose.v}, {0.0_in, target.v}) &&
       !angular_profiler.is_at_target(

@@ -23,6 +23,12 @@ void Rollers::outtake() {
     command(-600, -600);
 }
 
+void Rollers::outtake_until_empty() {
+  outtake();
+  wait_until([=]() { return !is_in_lower() && !is_in_upper(); }, 3000);
+  wait(500);
+}
+
 void Rollers::shoot() {
     command(0, 600);
 }

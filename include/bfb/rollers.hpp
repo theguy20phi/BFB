@@ -11,6 +11,7 @@ class Rollers {
   void standby();
   void intake();
   void outtake();
+  void outtake_until_empty();
   void shoot();
   void shoot_until_empty();
   void shoot_and_outtake();

@@ -3,7 +3,7 @@
 void remote_gui_task_fn() {
   master.clear();
   for (;;) {
-
+    if (!pros::competition::is_disabled()) {
     } else {
       master.print(0, 0, "%s                ", match->getRoutine().getInfo().name);
       bfb::wait(50);

@@ -1,19 +1,162 @@
 #include "main.h"
 
+std::unique_ptr<bfb::Chassis> chassis;
+std::unique_ptr<bfb::Rollers> rollers;
+pros::Controller remote(pros::E_CONTROLLER_MASTER);
+bfb::Routine routine = bfb::get_routine(3275); // 3275, so that deploy is default.
+pros::ADIPotentiometer auton_selector{{bfb::port::port_extender, bfb::port::auton_selector_pot}};
+
+void remote_gui_task_fn() {
+  remote.clear();
+  for (;;) {
+    if (!pros::competition::is_disabled()) {
+      remote.print(0, 0, "%f                ", chassis->get_pose().x.convert(okapi::inch));
+      bfb::wait(50);
+      remote.print(1, 0, "%f                ", chassis->get_pose().y.convert(okapi::inch));
+      bfb::wait(50);
+      remote.print(2, 0, "%f                ", chassis->get_pose().h.convert(okapi::degree));
+    } else {
+      remote.print(0, 0, "%s                ", bfb::get_routine_name(routine));
+      bfb::wait(50);
+      remote.print(1, 0, "                  ");
+      bfb::wait(50);
+      remote.print(2, 0, "                  ");
+    }
+    bfb::wait(50);
+  }
+}
+
 void initialize() {
+  chassis = std::make_unique<bfb::Chassis>();
+  rollers = std::make_unique<bfb::Rollers>();
+  bfb::doom_screen();
+  remote.clear();
+  pros::Task remote_gui_task(remote_gui_task_fn);
 }
 
 void disabled() {
+  for (;;) {
+    routine = bfb::get_routine(auton_selector.get_value());
+    bfb::wait(bfb::general_delay);
+  }
 }
 
 void competition_initialize() {
+  for (;;) {
+    routine = bfb::get_routine(auton_selector.get_value());
+    bfb::wait(bfb::general_delay);
+  }
 }
 
 void autonomous() {
+  switch (routine) {
+  case bfb::Routine::Row:
+  case bfb::Routine::Left:
+  case bfb::Routine::Right:
+  case bfb::Routine::Skills:
+    // TODO Set to whatever the pose is.
+    chassis->set_pose({});
+    rollers->shoot_and_outtake();
+    chassis->drive_voltage(-12000, 0, 0);
+    bfb::wait(500);
+    rollers->intake();
+    // TODO -45 changes based on where we start.
+    chassis->move_to({{1.5_tile, 1.0_tile, -45.0_deg}, {1.0_tile, 1.0_tile, -135.0_deg}});
+    rollers->standby();
+    chassis->move_to({{0.0_tile, 0.0_tile, -45.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_two_balls();
+    chassis->move_to({{1.0_tile, 1.0_tile, -180.0_deg}});
+    rollers->outtake_until_empty();
+    rollers->intake();
+    chassis->move_to({{1.0_tile, 3.0_tile, 0.0_deg}, {1.5_tile, 3.0_tile, -90.0_deg}});
+    rollers->standby();
+    chassis->move_to({{0.0_tile, 3.0_tile, -90.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_one_ball();
+    chassis->move_to({{1.5_tile, 3.0_tile, -180.0_deg}});
+    rollers->outtake_until_empty();
+    rollers->intake();
+    chassis->move_to({{1.5_tile, 5.0_tile, 0.0_deg}, {1.0_tile, 5.0_tile, -45.0_deg}});
+    chassis->move_to({{0.0_tile, 6.0_tile, -45.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_two_balls();
+    chassis->move_to({{1.5_tile, 4.0_tile, -180.0_deg}});
+    rollers->outtake_until_empty();
+    rollers->intake();
+    chassis->move_to({{3.0_tile, 4.0_tile, 90.0_deg}});
+    rollers->standby();
+    chassis->move_to({{3.0_tile, 6.0_tile, 0.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_one_ball();
+    chassis->move_to({{4.0_tile, 4.0_tile, -90.0_deg}});
+    rollers->outtake_until_empty();
+    rollers->intake();
+    chassis->move_to({{4.5_tile, 5.0_tile, 30.0_deg}, {5.0_tile, 5.0_tile, 45.0_deg}});
+    rollers->standby();
+    chassis->move_to({{6.0_tile, 6.0_tile, 45.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_two_balls();
+    chassis->move_to({{5.0_tile, 4.0_tile, -90.0_deg}});
+    rollers->outtake_until_empty();
+    rollers->intake();
+    chassis->move_to({{4.0_tile, 3.0_tile, -45.0_deg}});
+    rollers->standby();
+    for (int i = 0; i < 3; i++) {
+      chassis->move_to({{3.0_tile, 3.0_tile + 6.0_in, -90.0_deg}}, false, 2.0_s);
+      chassis->move_to({{4.0_tile, 3.0_tile + 6.0_in, -90.0_deg}});
+    }
+    chassis->move_to({{3.0_tile, 3.0_tile, -90.0_deg}}, true);
+    rollers->outtake_until_empty();
+    chassis->move_to({{4.0_tile, 3.0_tile, 90.0_deg}});
+    rollers->intake();
+    chassis->move_to({{4.5_tile, 3.0_tile, 90.0_deg}});
+    rollers->standby();
+    chassis->move_to({{6.0_tile, 3.0_tile, 90.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_one_ball();
+    chassis->move_to({{4.5_tile, 3.0_tile, 0.0_deg}});
+    rollers->outtake_until_empty();
+    rollers->intake();
+    chassis->move_to({{4.5_tile, 1.0_tile, -180.0_deg}, {5.0_tile, 5.0_tile, 135.0_deg}});
+    rollers->standby();
+    chassis->move_to({{6.0_tile, 0.0_tile, 135.0_deg}}, true);
+    rollers->shoot_until_empty();
+    rollers->intake_two_balls();
+    chassis->move_to({{5.0_tile, 5.0_tile, 0.0_deg}});
+    rollers->outtake();
+  default:
+    rollers->shoot_and_outtake();
+  };
 }
 
 void opcontrol() {
-  while (true) {
-    pros::delay(bfb::general_delay);
+  for (;;) {
+    chassis->drive_voltage(remote.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) * 100,
+                           remote.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) * 100,
+                           remote.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) * 100);
+    if (remote.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
+      chassis->toggle_hold();
+
+    if (remote.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+      rollers->toggle_shooter();
+    rollers->slow_rollers(remote.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
+    if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+      if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+        rollers->cycle();
+      else if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+        rollers->shoot_and_outtake();
+      else
+        rollers->shoot();
+    } else {
+      if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+        rollers->intake();
+      else if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+        rollers->outtake();
+      else
+        rollers->standby();
+    }
+
+    bfb::wait(10);
   }
 }

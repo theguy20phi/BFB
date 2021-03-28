@@ -4,6 +4,7 @@
 #include "geometry.hpp"
 #include "landmarker.hpp"
 #include "mathUtil.hpp"
+#include "misc.hpp"
 #include "motionProfiler.hpp"
 #include "odometer.hpp"
 #include "okapiUtil.hpp"
