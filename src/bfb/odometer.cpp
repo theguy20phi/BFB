@@ -5,12 +5,12 @@ Odometer::Odometer(char port,
                    const okapi::QLength i_distance_to,
                    bool reversed,
                    const okapi::QLength &i_circumference)
-  : encoder(port, reversed), distance_to(i_distance_to), circumference(i_circumference) {
+  : encoder(port, port + 1, reversed), distance_to(i_distance_to), circumference(i_circumference) {
 }
 
 okapi::QLength Odometer::distance_since() {
   const int reading{encoder.get_value()};
-  const okapi::QLength distance{(reading - previous_reading) / 360.0 * circumference};
+  const okapi::QLength distance{circumference * (reading - previous_reading) / 360.0};
   previous_reading = reading;
   return distance;
 }

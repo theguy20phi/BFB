@@ -51,17 +51,23 @@ void competition_initialize() {
 void autonomous() {
   switch (routine) {
   case bfb::Routine::Row:
-  case bfb::Routine::Left:
-  case bfb::Routine::Right:
-  case bfb::Routine::Skills:
-    // TODO Set to whatever the pose is.
     chassis->set_pose({});
+    chassis->move_to({{0.0_tile, 2.0_tile}, {0.0_tile, 0.0_tile}});
+    break;
+  case bfb::Routine::Left:
+    break;
+  case bfb::Routine::Right:
+    break;
+  case bfb::Routine::Skills:
+    chassis->set_pose({2.0_tile, 9.0_in, -90.0_deg});
+    rollers->toggle_shooter();
     rollers->shoot_and_outtake();
-    chassis->drive_voltage(-12000, 0, 0);
+    chassis->drive_voltage(-6000, 0, 0);
     bfb::wait(500);
     rollers->intake();
-    // TODO -45 changes based on where we start.
-    chassis->move_to({{1.5_tile, 1.0_tile, -45.0_deg}, {1.0_tile, 1.0_tile, -135.0_deg}});
+    chassis->move_to({{2.0_tile, 0.5_tile, -45.0_deg},
+                      {1.5_tile, 1.0_tile, -45.0_deg},
+                      {1.0_tile, 1.0_tile, -135.0_deg}});
     rollers->standby();
     chassis->move_to({{0.0_tile, 0.0_tile, -45.0_deg}}, true);
     rollers->shoot_until_empty();
@@ -125,8 +131,10 @@ void autonomous() {
     rollers->intake_two_balls();
     chassis->move_to({{5.0_tile, 5.0_tile, 0.0_deg}});
     rollers->outtake();
+    break;
   default:
     rollers->shoot_and_outtake();
+    break;
   };
 }
 

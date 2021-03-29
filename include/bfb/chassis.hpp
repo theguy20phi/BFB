@@ -21,7 +21,7 @@ class Chassis : public Task {
   void drive_voltage(double forward, double strafe, double turn);
   void move_to(const std::vector<Pose> &targets,
                bool involves_goal = false,
-               const okapi::QTime &timeout = 0.0_ms);
+               const okapi::QTime &timeout = 9000.0_s);
   void drive_toward(const Point &target, double command, double turn_command);
   void brake();
   void set_brake_mode(const pros::motor_brake_mode_e_t &brake_mode);
@@ -40,36 +40,34 @@ class Chassis : public Task {
   pros::Motor r_b_wheel{port::r_b_drive_motor, true};
   const double deadband{500.0};
   // TODO Tune these!
-  PID lateral_pos_pid{{0, 0, 0}, make_settled_util()};
-  PID lateral_vel_pid{{0, 0, 0}, make_settled_util()};
-  PID angular_pos_pid{{0, 0, 0}, make_settled_util()};
-  PID angular_vel_pid{{0, 0, 0}, make_settled_util()};
-  MotionProfiler<okapi::QLength, okapi::QSpeed, okapi::QAcceleration> lateral_profiler{0.5_in};
+  PID lateral_pos_pid{{10.0, 0.1, 0}, make_settled_util()};
+  PID lateral_vel_pid{{10.0, 0.1, 0}, make_settled_util()};
+  PID angular_pos_pid{{10.0, 0.1, 0}, make_settled_util()};
+  PID angular_vel_pid{{10.0, 0.1, 0}, make_settled_util()};
+  MotionProfiler<okapi::QLength, okapi::QSpeed, okapi::QAcceleration> lateral_profiler{1.0_in};
   MotionProfiler<okapi::QAngle, okapi::QAngularSpeed, okapi::QAngularAcceleration> angular_profiler{
     1.0_deg};
   // TODO Have actual values here!
-  static constexpr okapi::QSpeed max_lateral_vel{0.1_inps};
-  static constexpr okapi::QAngularSpeed max_angular_vel{0.1_radps};
-  static constexpr okapi::QAcceleration max_lateral_accel{0.01_inpsps};
-  static constexpr okapi::QAngularAcceleration max_angular_accel{0.01_radpsps};
-  // TODO 16 comes from the track of the robot in inches.
-  static constexpr double curvature_constraint{16.0};
+  static constexpr okapi::QSpeed max_lateral_vel{65.0_inps};
+  static constexpr okapi::QAngularSpeed max_angular_vel{3.5_radps};
+  static constexpr okapi::QAcceleration max_lateral_accel{20.0_inpsps};
+  static constexpr okapi::QAngularAcceleration max_angular_accel{1.0_radpsps};
   // TODO Tune these! Start with kv = 1 / max_vel.
-  static constexpr double lateral_kv{0.0};
-  static constexpr double lateral_ka{0.0};
-  static constexpr double angular_kv{0.0};
-  static constexpr double angular_ka{0.0};
+  static constexpr double lateral_kv{185.0};
+  static constexpr double lateral_ka{70.0};
+  static constexpr double angular_kv{3400.0};
+  static constexpr double angular_ka{1200.0};
   Pose pose{};
   Pose previous_pose{};
   okapi::QTime previous_time{0_ms};
   // TODO This might actually be _deg
-  const okapi::QAngle gyrodom_threshold{0.075_rad};
+  const okapi::QAngle gyrodom_threshold{0.002_rad};
+  okapi::QAngle previous_imu{0.0_deg};
   std::vector<pros::Imu> imus{
     {pros::Imu{port::imu_a}, pros::Imu{port::imu_b}, pros::Imu{port::imu_c}}};
-  // TODO Get real values here! (also make sure top port is the char and bot port is the next char)
-  Odometer l_odom{port::l_encoder, 8.0_in};
-  Odometer r_odom{port::r_encoder, 8.0_in};
-  Odometer s_odom{port::s_encoder, 8.0_in};
+  Odometer l_odom{port::l_encoder, 7.0_in, true};
+  Odometer r_odom{port::r_encoder, 7.0_in, true};
+  Odometer s_odom{port::s_encoder, 6.0_in, true};
   pros::ADILineSensor center_line_sensor{{port::port_extender, port::center_line_tracker}};
   // TODO The threshold at which the line sensor triggers may be different.
   static constexpr int line_threshold{500};

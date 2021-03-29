@@ -9,21 +9,21 @@ Chassis::Chassis() {
 void Chassis::task_fn() {
   for (pros::Imu imu : imus)
     imu.reset();
-  bfb::wait(3000 * imus.size()); // Takes about three seconds for an IMU to calibrate.
+  bfb::wait(3000); // Takes about three seconds for an IMU to calibrate.
   for (;;) {
     okapi::QAngle imu_reading{0.0_deg};
     for (pros::Imu imu : imus)
       imu_reading += imu.get_rotation() * (1.0 / imus.size()) * okapi::degree;
-    okapi::QAngle delta_h_imu{imu_reading - previous_pose.h};
+    okapi::QAngle delta_h_imu{imu_reading - previous_imu};
     const okapi::QLength l_delta{l_odom.distance_since()};
     const okapi::QLength r_delta{r_odom.distance_since()};
     const okapi::QLength s_delta{s_odom.distance_since()};
     okapi::QTime time{pros::millis() * okapi::millisecond};
-    // TODO This might actually need to be okapi::degree
-    const okapi::QAngle delta_h_odom{okapi::radian * (l_delta + r_delta) /
-                                     (l_odom.distance_to_wheel() + r_odom.distance_to_wheel())};
+    const okapi::QAngle delta_h_odom{
+      okapi::radian *
+      ((l_delta - r_delta) / (l_odom.distance_to_wheel() + r_odom.distance_to_wheel()))};
     const okapi::QAngle delta_h{
-      okapi::abs(delta_h_imu - delta_h_odom) > gyrodom_threshold ? delta_h_imu : delta_h_odom};
+      okapi::abs(delta_h_imu - delta_h_odom) > gyrodom_threshold ? delta_h_odom : delta_h_imu};
     okapi::QLength local_x{0.0_in};
     okapi::QLength local_y{0.0_in};
     if (delta_h != 0.0_deg) {
@@ -51,6 +51,7 @@ void Chassis::task_fn() {
     pose = goal_landmarker.correct_position(pose, goal_limit_switch.get_value());
     previous_time = time;
     previous_pose = pose;
+    previous_imu = imu_reading;
     wait(general_delay);
   }
 }
@@ -59,20 +60,21 @@ void Chassis::drive_voltage(double forward, double strafe, double turn) {
   if (fabs(forward) + fabs(strafe) + fabs(turn) <= deadband)
     brake();
   else {
-    double max_cmd{std::max(std::max(forward + strafe + turn, forward - strafe + turn),
-                            std::max(forward - strafe - turn, forward + strafe - turn))};
-    l_f_wheel.move_voltage((forward + strafe + turn) / max_cmd * 12000.0);
-    l_b_wheel.move_voltage((forward - strafe + turn) / max_cmd * 12000.0);
-    r_f_wheel.move_voltage((forward - strafe - turn) / max_cmd * 12000.0);
-    r_b_wheel.move_voltage((forward + strafe - turn) / max_cmd * 12000.0);
+    double max_cmd{
+      std::max(std::max(fabs(forward + strafe + turn), fabs(forward - strafe + turn)),
+               std::max(fabs(forward - strafe - turn), fabs(forward + strafe - turn)))};
+    l_f_wheel.move_voltage((forward + strafe + turn) / max_cmd * std::min(12000.0, max_cmd));
+    l_b_wheel.move_voltage((forward - strafe + turn) / max_cmd * std::min(12000.0, max_cmd));
+    r_f_wheel.move_voltage((forward - strafe - turn) / max_cmd * std::min(12000.0, max_cmd));
+    r_b_wheel.move_voltage((forward + strafe - turn) / max_cmd * std::min(12000.0, max_cmd));
   }
 }
 
 void Chassis::move_to(const std::vector<Pose> &targets,
                       bool involves_goal,
                       const okapi::QTime &timeout) {
-  okapi::QTime time{pros::millis() * okapi::millisecond};
   for (Pose target : targets) {
+    okapi::QTime time{pros::millis() * okapi::millisecond};
     do {
       const okapi::QLength lateral_distance{-pose.distance_to(target)};
       const okapi::QAngle angular_distance(-okapi::OdomMath::constrainAngle180(target.h - pose.h));
@@ -98,11 +100,11 @@ void Chassis::move_to(const std::vector<Pose> &targets,
       drive_toward(target, lateral_command, angular_command);
       wait(general_delay);
     } while (
-      !lateral_profiler.is_at_target({pose.distance_to(target), pose.v}, {0.0_in, target.v}) &&
-      !angular_profiler.is_at_target(
-        {okapi::OdomMath::constrainAngle180(target.h - pose.h), pose.w}, {0.0_deg, target.w}) &&
+      (!lateral_profiler.is_at_target({pose.distance_to(target), pose.v}, {0.0_in, target.v}) ||
+       !angular_profiler.is_at_target(
+         {okapi::OdomMath::constrainAngle180(target.h - pose.h), pose.w}, {0.0_deg, target.w})) &&
       !(involves_goal && goal_limit_switch.get_value()) &&
-      !(timeout != 0.0_ms && pros::millis() * okapi::millisecond - time >= timeout));
+      !(pros::millis() * okapi::millisecond - time >= timeout));
   }
 }
 
@@ -111,8 +113,10 @@ void Chassis::drive_toward(const Point &target, double command, double turn_comm
   // TODO May need to be negative pose.h
   const Point strafe_forward{coord_diff.rotate(pose.h)};
   const double strafe_command{
+    command *
     (strafe_forward.x / okapi::abs(strafe_forward.x + strafe_forward.y)).convert(okapi::number)};
   const double forward_command{
+    command *
     (strafe_forward.y / okapi::abs(strafe_forward.x + strafe_forward.y)).convert(okapi::number)};
   drive_voltage(forward_command, strafe_command, turn_command);
 }

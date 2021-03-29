@@ -3,7 +3,7 @@
 namespace bfb {
 Rollers::Rollers() {
   lower_shooter.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
-  upper_shooter.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+  upper_shooter.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   left_side.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
   right_side.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
 }
