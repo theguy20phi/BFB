@@ -40,23 +40,8 @@ class Chassis : public Task {
   pros::Motor r_b_wheel{port::r_b_drive_motor, true};
   const double deadband{500.0};
   // TODO Tune these!
-  PID lateral_pos_pid{{10.0, 0.1, 0}, make_settled_util()};
-  PID lateral_vel_pid{{10.0, 0.1, 0}, make_settled_util()};
-  PID angular_pos_pid{{10.0, 0.1, 0}, make_settled_util()};
-  PID angular_vel_pid{{10.0, 0.1, 0}, make_settled_util()};
-  MotionProfiler<okapi::QLength, okapi::QSpeed, okapi::QAcceleration> lateral_profiler{1.0_in};
-  MotionProfiler<okapi::QAngle, okapi::QAngularSpeed, okapi::QAngularAcceleration> angular_profiler{
-    1.0_deg};
-  // TODO Have actual values here!
-  static constexpr okapi::QSpeed max_lateral_vel{65.0_inps};
-  static constexpr okapi::QAngularSpeed max_angular_vel{3.5_radps};
-  static constexpr okapi::QAcceleration max_lateral_accel{20.0_inpsps};
-  static constexpr okapi::QAngularAcceleration max_angular_accel{1.0_radpsps};
-  // TODO Tune these! Start with kv = 1 / max_vel.
-  static constexpr double lateral_kv{185.0};
-  static constexpr double lateral_ka{70.0};
-  static constexpr double angular_kv{3400.0};
-  static constexpr double angular_ka{1200.0};
+  PID lateral_pos_pid{{2500.0, 0.0, 40000}, make_settled_util(1.0, 0.25)};
+  PID angular_pos_pid{{1250.0, 0.0, 3000}, make_settled_util(1.0, 0.25)};
   Pose pose{};
   Pose previous_pose{};
   okapi::QTime previous_time{0_ms};
@@ -74,11 +59,12 @@ class Chassis : public Task {
   // TODO May be normally closed instead of normally open
   pros::ADIDigitalIn goal_limit_switch{{port::port_extender, port::goal_limit_switch}};
   LineLandmarker line_landmarker{
-    {{{0.0_tile, 1.0_tile - 1.0_in}, {6.0_tile, 1.0_tile - 1.0_in}},
-     {{0.0_tile, 3.0_tile - 1.0_in}, {6.0_tile, 3.0_tile - 1.0_in}},
-     {{0.0_tile, 3.0_tile + 1.0_in}, {6.0_tile, 3.0_tile + 1.0_in}},
-     {{0.0_tile, 5.0_tile + 1.0_in}, {6.0_tile, 5.0_tile + 1.0_in}}},
-    {{{2.5_tile, 1.5_tile}, {3.5_tile, 0.0_tile}}, {{2.5_tile, 4.5_tile}, {3.5_tile, 6.0_tile}}}};
+    {{{0.0_tile, 1.0_tile - 0.5_in}, {6.0_tile, 1.0_tile - 0.5_in}},
+     {{0.0_tile, 3.0_tile - 0.5_in}, {6.0_tile, 3.0_tile - 0.5_in}},
+     {{0.0_tile, 3.0_tile + 0.5_in}, {6.0_tile, 3.0_tile + 0.5_in}},
+     {{0.0_tile, 5.0_tile + 0.5_in}, {6.0_tile, 5.0_tile + 0.5_in}}},
+    {{{2.5_tile, 1.5_tile}, {3.5_tile, 0.0_tile}}, {{2.5_tile, 4.5_tile}, {3.5_tile, 6.0_tile}}},
+    0.0};
   // TODO 9.0_in should be replaced with actual distance from front to center.
   static constexpr okapi::QLength goal_radius{5.65_in + 9.0_in};
   GoalLandmarker goal_landmarker{{{{3.0_tile, 3.0_tile}, goal_radius},
@@ -89,6 +75,7 @@ class Chassis : public Task {
                                   {{6.0_tile - 5.65_in, 3.0_tile}, goal_radius},
                                   {{5.65_in, 6.0_tile - 5.65_in}, goal_radius},
                                   {{3.0_tile, 6.0_tile - 5.65_in}, goal_radius},
-                                  {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}}};
+                                  {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}},
+                                 0.0};
 };
 } // namespace bfb

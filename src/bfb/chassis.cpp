@@ -78,40 +78,24 @@ void Chassis::move_to(const std::vector<Pose> &targets,
     do {
       const okapi::QLength lateral_distance{-pose.distance_to(target)};
       const okapi::QAngle angular_distance(-okapi::OdomMath::constrainAngle180(target.h - pose.h));
-      // TODO If something seems strange here, consider changing target.w to 0, for some reason...
-      auto angular_target = angular_profiler.next_target(
-        {angular_distance, pose.w}, {0.0_deg, target.w}, max_angular_vel, max_angular_accel);
-      // TODO May need to change what max velocity equation is. Now may need to add it back.
-      auto lateral_target = lateral_profiler.next_target(
-        {lateral_distance, pose.v}, {0.0_in, target.v}, max_lateral_vel, max_lateral_accel);
       lateral_pos_pid.calculate(lateral_distance.convert(okapi::inch));
-      angular_pos_pid.calculate(angular_distance.convert(okapi::radian));
-      lateral_vel_pid.set_target(pose.v.convert(inps), lateral_target.v.convert(inps));
-      lateral_vel_pid.calculate(pose.v.convert(inps));
-      angular_vel_pid.set_target(pose.w.convert(okapi::radps),
-                                 angular_target.v.convert(okapi::radps));
-      angular_vel_pid.calculate(pose.w.convert(okapi::radps));
-      const double lateral_command{lateral_pos_pid.get_output() + lateral_vel_pid.get_output() +
-                                   lateral_kv * lateral_target.v.convert(inps) +
-                                   lateral_ka * lateral_target.a.convert(inpsps)};
-      const double angular_command(angular_pos_pid.get_output() + angular_vel_pid.get_output() +
-                                   angular_kv * angular_target.v.convert(okapi::radps) +
-                                   angular_ka * angular_target.a.convert(radpsps));
+      angular_pos_pid.calculate(angular_distance.convert(okapi::degree));
+      const double lateral_command{lateral_pos_pid.get_output()};
+      const double angular_command(angular_pos_pid.get_output());
       drive_toward(target, lateral_command, angular_command);
       wait(general_delay);
-    } while (
-      (!lateral_profiler.is_at_target({pose.distance_to(target), pose.v}, {0.0_in, target.v}) ||
-       !angular_profiler.is_at_target(
-         {okapi::OdomMath::constrainAngle180(target.h - pose.h), pose.w}, {0.0_deg, target.w})) &&
-      !(involves_goal && goal_limit_switch.get_value()) &&
-      !(pros::millis() * okapi::millisecond - time >= timeout));
+    } while ((!lateral_pos_pid.is_settled() || !angular_pos_pid.is_settled()) &&
+             !(involves_goal && goal_limit_switch.get_value()) &&
+             !(pros::millis() * okapi::millisecond - time >= timeout));
   }
+  brake();
 }
 
 void Chassis::drive_toward(const Point &target, double command, double turn_command) {
   const Point coord_diff{target.x - pose.x, target.y - pose.y};
   // TODO May need to be negative pose.h
-  const Point strafe_forward{coord_diff.rotate(pose.h)};
+  const Point strafe_forward{coord_diff.rotate(
+    okapi::OdomMath::constrainAngle180(pose.h + pose.w * general_delay * okapi::millisecond))};
   const double strafe_command{
     command *
     (strafe_forward.x / okapi::abs(strafe_forward.x + strafe_forward.y)).convert(okapi::number)};

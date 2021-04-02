@@ -104,9 +104,7 @@ Point GoalLandmarker::get_closest_point(const Pose &current, const Circle &close
   const okapi::QLength y{closest_goal.center.y +
                          closest_goal.radius *
                            (y_diff / okapi::sqrt(x_diff * x_diff + y_diff * y_diff))};
-  // TODO May have conflicts with how straight forward = 0 deg.
-  const okapi::QAngle h{okapi::atan2(closest_goal.center.y - y, closest_goal.center.x - x)};
-  return Point{x, y, h};
+  return Point{x, y, current.h};
 }
 
 Pose GoalLandmarker::weight(const Pose &current, const Point &proposed) const {

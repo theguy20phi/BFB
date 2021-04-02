@@ -52,7 +52,10 @@ void autonomous() {
   switch (routine) {
   case bfb::Routine::Row:
     chassis->set_pose({});
-    chassis->move_to({{0.0_tile, 2.0_tile}, {0.0_tile, 0.0_tile}});
+    rollers->shoot_and_outtake();
+    bfb::wait(500);
+    rollers->intake();
+    chassis->move_to({{1.5_tile, 1.5_tile, 135.0_deg}, {0.9_tile, 0.9_tile, 135.0_deg}});
     break;
   case bfb::Routine::Left:
     break;
@@ -60,80 +63,57 @@ void autonomous() {
     break;
   case bfb::Routine::Skills:
     chassis->set_pose({2.0_tile, 9.0_in, -90.0_deg});
-    rollers->toggle_shooter();
     rollers->shoot_and_outtake();
-    chassis->drive_voltage(-6000, 0, 0);
-    bfb::wait(500);
+    chassis->drive_voltage(-12000, 0, 0);
+    bfb::wait(1500);
     rollers->intake();
-    chassis->move_to({{2.0_tile, 0.5_tile, -45.0_deg},
-                      {1.5_tile, 1.0_tile, -45.0_deg},
-                      {1.0_tile, 1.0_tile, -135.0_deg}});
+    chassis->move_to({{2.15_tile, 0.35_tile, -45.0_deg},
+                      {1.3_tile, 1.2_tile, -45.0_deg},
+                      {1.0_tile, 1.0_tile, -135.0_deg}},
+                     false,
+                     3.0_s);
     rollers->standby();
-    chassis->move_to({{0.0_tile, 0.0_tile, -45.0_deg}}, true);
+    chassis->move_to({{0.0_tile, 0.0_tile, -135.0_deg}}, true, 3.0_s);
     rollers->shoot_until_empty();
     rollers->intake_two_balls();
-    chassis->move_to({{1.0_tile, 1.0_tile, -180.0_deg}});
+    chassis->move_to({{1.0_tile, 1.0_tile, -180.0_deg}}, false, 2.0_s);
     rollers->outtake_until_empty();
     rollers->intake();
-    chassis->move_to({{1.0_tile, 3.0_tile, 0.0_deg}, {1.5_tile, 3.0_tile, -90.0_deg}});
+    chassis->move_to({{1.0_tile, 1.5_tile, 0.0_deg},
+                      {1.0_tile, 3.0_tile, 0.0_deg},
+                      {1.5_tile, 3.0_tile, -90.0_deg}},
+                     false,
+                     2.0_s);
     rollers->standby();
     chassis->move_to({{0.0_tile, 3.0_tile, -90.0_deg}}, true);
     rollers->shoot_until_empty();
     rollers->intake_one_ball();
-    chassis->move_to({{1.5_tile, 3.0_tile, -180.0_deg}});
+    chassis->move_to({{1.5_tile, 3.0_tile, -180.0_deg}}, false, 2.0_s);
     rollers->outtake_until_empty();
     rollers->intake();
-    chassis->move_to({{1.5_tile, 5.0_tile, 0.0_deg}, {1.0_tile, 5.0_tile, -45.0_deg}});
-    chassis->move_to({{0.0_tile, 6.0_tile, -45.0_deg}}, true);
+    chassis->move_to({{1.5_tile, 4.0_tile, 0.0_deg},
+                      {1.5_tile, 5.5_tile, 0.0_deg},
+                      {1.0_tile, 5.0_tile, -45.0_deg}},
+                     false,
+                     3.25_s);
+    rollers->standby();
+    chassis->move_to({{0.0_tile, 6.0_tile, -45.0_deg}}, true, 2.0_s);
     rollers->shoot_until_empty();
     rollers->intake_two_balls();
-    chassis->move_to({{1.5_tile, 4.0_tile, -180.0_deg}});
+    chassis->move_to({{1.5_tile, 4.0_tile, -45.0_deg}}, false, 2.5_s);
     rollers->outtake_until_empty();
     rollers->intake();
-    chassis->move_to({{3.0_tile, 4.0_tile, 90.0_deg}});
+    chassis->move_to({{1.5_tile, 4.0_tile, 90.0_deg}, {3.0_tile, 4.0_tile, 90.0_deg}}, false, 2.0_s);
     rollers->standby();
-    chassis->move_to({{3.0_tile, 6.0_tile, 0.0_deg}}, true);
+    chassis->move_to({{3.0_tile, 4.0_tile, 0.0_deg}, {3.0_tile, 6.0_tile, 0.0_deg}}, true, 2.0_s);
     rollers->shoot_until_empty();
     rollers->intake_one_ball();
-    chassis->move_to({{4.0_tile, 4.0_tile, -90.0_deg}});
+    chassis->move_to({{3.0_tile, 4.0_tile, 0.0_deg}}, false, 2.0_s);
     rollers->outtake_until_empty();
-    rollers->intake();
-    chassis->move_to({{4.5_tile, 5.0_tile, 30.0_deg}, {5.0_tile, 5.0_tile, 45.0_deg}});
-    rollers->standby();
-    chassis->move_to({{6.0_tile, 6.0_tile, 45.0_deg}}, true);
-    rollers->shoot_until_empty();
-    rollers->intake_two_balls();
-    chassis->move_to({{5.0_tile, 4.0_tile, -90.0_deg}});
-    rollers->outtake_until_empty();
-    rollers->intake();
-    chassis->move_to({{4.0_tile, 3.0_tile, -45.0_deg}});
-    rollers->standby();
-    for (int i = 0; i < 3; i++) {
-      chassis->move_to({{3.0_tile, 3.0_tile + 6.0_in, -90.0_deg}}, false, 2.0_s);
-      chassis->move_to({{4.0_tile, 3.0_tile + 6.0_in, -90.0_deg}});
-    }
-    chassis->move_to({{3.0_tile, 3.0_tile, -90.0_deg}}, true);
-    rollers->outtake_until_empty();
-    chassis->move_to({{4.0_tile, 3.0_tile, 90.0_deg}});
-    rollers->intake();
-    chassis->move_to({{4.5_tile, 3.0_tile, 90.0_deg}});
-    rollers->standby();
-    chassis->move_to({{6.0_tile, 3.0_tile, 90.0_deg}}, true);
-    rollers->shoot_until_empty();
-    rollers->intake_one_ball();
-    chassis->move_to({{4.5_tile, 3.0_tile, 0.0_deg}});
-    rollers->outtake_until_empty();
-    rollers->intake();
-    chassis->move_to({{4.5_tile, 1.0_tile, -180.0_deg}, {5.0_tile, 5.0_tile, 135.0_deg}});
-    rollers->standby();
-    chassis->move_to({{6.0_tile, 0.0_tile, 135.0_deg}}, true);
-    rollers->shoot_until_empty();
-    rollers->intake_two_balls();
-    chassis->move_to({{5.0_tile, 5.0_tile, 0.0_deg}});
-    rollers->outtake();
     break;
   default:
-    rollers->shoot_and_outtake();
+    chassis->set_pose({});
+    chassis->move_to({{0.0_in, 3.0_tile, 180.0_deg}, {}});
     break;
   };
 }

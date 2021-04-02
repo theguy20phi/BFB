@@ -1,13 +1,15 @@
 #pragma once
 
 #include "api.h"
+#include "task.hpp"
 #include "values.hpp"
 #include "wait.hpp"
 
 namespace bfb {
-class Rollers {
+class Rollers : public Task {
   public:
   Rollers();
+  void task_fn() override;
   void standby();
   void intake();
   void outtake();
@@ -27,6 +29,7 @@ class Rollers {
   bool is_in_upper();
 
   private:
+  bool intaking = false;
   const int threshold{2750};
   double power{600};
   bool shooting{true};
