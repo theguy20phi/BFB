@@ -16,12 +16,14 @@ class Rollers : public Task {
   void outtake_until_empty();
   void shoot();
   void shoot_until_empty();
+  void shoot_and_outtake_until_empty();
   void shoot_and_outtake();
   void cycle();
   void intake_one_ball();
   void intake_two_balls();
   void toggle_shooter();
   void slow_rollers(bool slow);
+  void emergency_outtake();
 
   private:
   void command(double side_cmd, double l_shooter_cmd);

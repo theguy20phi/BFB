@@ -7,23 +7,14 @@ Chassis::Chassis() {
 }
 
 void Chassis::task_fn() {
-  for (pros::Imu imu : imus)
-    imu.reset();
-  bfb::wait(3000); // Takes about three seconds for an IMU to calibrate.
   for (;;) {
-    okapi::QAngle imu_reading{0.0_deg};
-    for (pros::Imu imu : imus)
-      imu_reading += imu.get_rotation() * (1.0 / imus.size()) * okapi::degree;
-    okapi::QAngle delta_h_imu{imu_reading - previous_imu};
     const okapi::QLength l_delta{l_odom.distance_since()};
     const okapi::QLength r_delta{r_odom.distance_since()};
     const okapi::QLength s_delta{s_odom.distance_since()};
     okapi::QTime time{pros::millis() * okapi::millisecond};
-    const okapi::QAngle delta_h_odom{
+    const okapi::QAngle delta_h{
       okapi::radian *
       ((l_delta - r_delta) / (l_odom.distance_to_wheel() + r_odom.distance_to_wheel()))};
-    const okapi::QAngle delta_h{
-      okapi::abs(delta_h_imu - delta_h_odom) > gyrodom_threshold ? delta_h_odom : delta_h_imu};
     okapi::QLength local_x{0.0_in};
     okapi::QLength local_y{0.0_in};
     if (delta_h != 0.0_deg) {
@@ -47,11 +38,8 @@ void Chassis::task_fn() {
     const okapi::QTime delta_t{time - previous_time};
     pose.v = previous_pose.distance_to(pose) / delta_t;
     pose.w = (pose.h - previous_pose.h) / delta_t;
-    pose = line_landmarker.correct_position(pose, line_sensor_triggered());
-    pose = goal_landmarker.correct_position(pose, goal_limit_switch.get_value());
     previous_time = time;
     previous_pose = pose;
-    previous_imu = imu_reading;
     wait(general_delay);
   }
 }
@@ -93,15 +81,9 @@ void Chassis::move_to(const std::vector<Pose> &targets,
 
 void Chassis::drive_toward(const Point &target, double command, double turn_command) {
   const Point coord_diff{target.x - pose.x, target.y - pose.y};
-  // TODO May need to be negative pose.h
-  const Point strafe_forward{coord_diff.rotate(
-    okapi::OdomMath::constrainAngle180(pose.h + pose.w * general_delay * okapi::millisecond))};
-  const double strafe_command{
-    command *
-    (strafe_forward.x / okapi::abs(strafe_forward.x + strafe_forward.y)).convert(okapi::number)};
-  const double forward_command{
-    command *
-    (strafe_forward.y / okapi::abs(strafe_forward.x + strafe_forward.y)).convert(okapi::number)};
+  const okapi::QAngle angle_to{okapi::atan2(coord_diff.y, coord_diff.x) + pose.h};
+  const double strafe_command{command * okapi::cos(angle_to).convert(okapi::number)};
+  const double forward_command{command * okapi::sin(angle_to).convert(okapi::number)};
   drive_voltage(forward_command, strafe_command, turn_command);
 }
 

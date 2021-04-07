@@ -19,8 +19,5 @@ namespace port {
     constexpr char center_line_tracker{1};
     constexpr char goal_limit_switch{2};
     constexpr char auton_selector_pot{3};
-    constexpr int imu_a{13};
-    constexpr int imu_b{14};
-    constexpr int imu_c{15};
 }   
 }

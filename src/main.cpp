@@ -28,6 +28,7 @@ void remote_gui_task_fn() {
 
 void initialize() {
   chassis = std::make_unique<bfb::Chassis>();
+  bfb::wait(1000);
   rollers = std::make_unique<bfb::Rollers>();
   bfb::doom_screen();
   remote.clear();
@@ -49,17 +50,70 @@ void competition_initialize() {
 }
 
 void autonomous() {
+  chassis->set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
   switch (routine) {
   case bfb::Routine::Row:
-    chassis->set_pose({});
+    chassis->set_pose({55.7_in, 10.414_in, -80.0_deg});
     rollers->shoot_and_outtake();
     bfb::wait(500);
     rollers->intake();
-    chassis->move_to({{1.5_tile, 1.5_tile, 135.0_deg}, {0.9_tile, 0.9_tile, 135.0_deg}});
+    chassis->move_to({{1.5_tile, 1.5_tile, -45.0_deg},
+                      {1.5_tile, 1.5_tile, -135.0_deg},
+                      {0.8_tile, 0.8_tile, -135.0_deg}},
+                     false,
+                     1.625_s);
+    bfb::wait(250);
+    rollers->standby();
+    chassis->move_to({{0.0_tile, 0.0_tile, -135.0_deg}}, true, 1.625_s);
+    rollers->shoot_and_outtake_until_empty();
+    bfb::wait(100);
+    chassis->move_to(
+      {{1.5_tile, 1.5_tile, -135.0_deg}, {1.5_tile, 1.5_tile, 90.0_deg}}, false, 1.0_s);
+    rollers->standby();
+    chassis->move_to({{4.5_tile, 1.5_tile, 90.0_deg}}, false, 2.75_s);
+    rollers->intake();
+    chassis->move_to(
+      {{4.5_tile, 1.5_tile, 135.0_deg}, {5.2_tile, 0.8_tile, 135.0_deg}}, false, 1.625_s);
+    bfb::wait(250);
+    rollers->standby();
+    chassis->move_to({{6.0_tile, 0.0_tile, 135.0_deg}}, true, 1.625_s);
+    rollers->shoot_and_outtake_until_empty();
+    bfb::wait(100);
+    chassis->move_to({{4.0_tile, 2.0_tile, 135.0_deg}});
     break;
   case bfb::Routine::Left:
+    chassis->set_pose({55.7_in, 10.414_in, -80.0_deg});
+    rollers->shoot_and_outtake();
+    bfb::wait(500);
+    rollers->intake();
+    chassis->move_to({{1.5_tile, 1.5_tile, -45.0_deg},
+                      {1.5_tile, 1.5_tile, -135.0_deg},
+                      {0.8_tile, 0.8_tile, -135.0_deg}},
+                     false,
+                     1.625_s);
+    bfb::wait(250);
+    rollers->standby();
+    chassis->move_to({{0.0_tile, 0.0_tile, -135.0_deg}}, true, 1.625_s);
+    rollers->shoot_and_outtake_until_empty();
+    bfb::wait(100);
+    chassis->move_to({{2.0_tile, 2.0_tile, -135.0_deg}});
     break;
   case bfb::Routine::Right:
+    chassis->set_pose({88.3_in, 10.414_in, 80.0_deg});
+    rollers->shoot_and_outtake();
+    bfb::wait(500);
+    rollers->intake();
+    chassis->move_to({{4.5_tile, 1.5_tile, 45.0_deg},
+                      {4.5_tile, 1.5_tile, 135.0_deg},
+                      {5.2_tile, 0.8_tile, 135.0_deg}},
+                     false,
+                     2.5_s);
+    bfb::wait(250);
+    rollers->standby();
+    chassis->move_to({{6.0_tile, 0.0_tile, 135.0_deg}}, true, 1.625_s);
+    rollers->shoot_and_outtake_until_empty();
+    bfb::wait(100);
+    chassis->move_to({{4.5_tile, 2.0_tile, 135.0_deg}});
     break;
   case bfb::Routine::Skills:
     chassis->set_pose({2.0_tile, 9.0_in, -90.0_deg});
@@ -103,7 +157,8 @@ void autonomous() {
     chassis->move_to({{1.5_tile, 4.0_tile, -45.0_deg}}, false, 2.5_s);
     rollers->outtake_until_empty();
     rollers->intake();
-    chassis->move_to({{1.5_tile, 4.0_tile, 90.0_deg}, {3.0_tile, 4.0_tile, 90.0_deg}}, false, 2.0_s);
+    chassis->move_to(
+      {{1.5_tile, 4.0_tile, 90.0_deg}, {3.0_tile, 4.0_tile, 90.0_deg}}, false, 2.0_s);
     rollers->standby();
     chassis->move_to({{3.0_tile, 4.0_tile, 0.0_deg}, {3.0_tile, 6.0_tile, 0.0_deg}}, true, 2.0_s);
     rollers->shoot_until_empty();
@@ -113,12 +168,15 @@ void autonomous() {
     break;
   default:
     chassis->set_pose({});
-    chassis->move_to({{0.0_in, 3.0_tile, 180.0_deg}, {}});
+    rollers->shoot_and_outtake();
+    bfb::wait(1000);
+    rollers->standby();
     break;
   };
 }
 
 void opcontrol() {
+  chassis->set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
   for (;;) {
     chassis->drive_voltage(remote.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) * 100,
                            remote.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) * 100,
@@ -126,23 +184,27 @@ void opcontrol() {
     if (remote.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_B))
       chassis->toggle_hold();
 
-    if (remote.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
-      rollers->toggle_shooter();
-    rollers->slow_rollers(remote.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
-    if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-      if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-        rollers->cycle();
-      else if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-        rollers->shoot_and_outtake();
-      else
-        rollers->shoot();
+    if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_Y)) {
+      rollers->emergency_outtake();
     } else {
-      if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
-        rollers->intake();
-      else if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
-        rollers->outtake();
-      else
-        rollers->standby();
+      if (remote.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A))
+        rollers->toggle_shooter();
+      rollers->slow_rollers(remote.get_digital(pros::E_CONTROLLER_DIGITAL_R2));
+      if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+        if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+          rollers->cycle();
+        else if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+          rollers->shoot_and_outtake();
+        else
+          rollers->shoot();
+      } else {
+        if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L1))
+          rollers->intake();
+        else if (remote.get_digital(pros::E_CONTROLLER_DIGITAL_L2))
+          rollers->outtake();
+        else
+          rollers->standby();
+      }
     }
 
     bfb::wait(10);

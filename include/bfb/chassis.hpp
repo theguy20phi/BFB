@@ -40,19 +40,14 @@ class Chassis : public Task {
   pros::Motor r_b_wheel{port::r_b_drive_motor, true};
   const double deadband{500.0};
   // TODO Tune these!
-  PID lateral_pos_pid{{2500.0, 0.0, 40000}, make_settled_util(1.0, 0.25)};
-  PID angular_pos_pid{{1250.0, 0.0, 3000}, make_settled_util(1.0, 0.25)};
+  PID lateral_pos_pid{{2750.0, 0.0, 42500}, make_settled_util(1.5, 0.5)};
+  PID angular_pos_pid{{1500.0, 0.0, 3250}, make_settled_util(1.5, 0.5)};
   Pose pose{};
   Pose previous_pose{};
   okapi::QTime previous_time{0_ms};
-  // TODO This might actually be _deg
-  const okapi::QAngle gyrodom_threshold{0.002_rad};
-  okapi::QAngle previous_imu{0.0_deg};
-  std::vector<pros::Imu> imus{
-    {pros::Imu{port::imu_a}, pros::Imu{port::imu_b}, pros::Imu{port::imu_c}}};
-  Odometer l_odom{port::l_encoder, 7.0_in, true};
-  Odometer r_odom{port::r_encoder, 7.0_in, true};
-  Odometer s_odom{port::s_encoder, 6.0_in, true};
+  Odometer l_odom{port::l_encoder, 6.9375_in, true};
+  Odometer r_odom{port::r_encoder, 6.9375_in, true};
+  Odometer s_odom{port::s_encoder, 5.725_in, true};
   pros::ADILineSensor center_line_sensor{{port::port_extender, port::center_line_tracker}};
   // TODO The threshold at which the line sensor triggers may be different.
   static constexpr int line_threshold{500};

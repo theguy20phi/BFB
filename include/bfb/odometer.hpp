@@ -11,7 +11,7 @@ class Odometer {
   Odometer(char port,
            const okapi::QLength i_distance_to,
            bool reversed = false,
-           const okapi::QLength &i_circumference = 8.63938_in);
+           const okapi::QLength &i_circumference = 8.639379797371932_in);
   okapi::QLength distance_since();
   okapi::QLength distance_to_wheel() const;
   int get_raw() const;

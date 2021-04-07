@@ -57,7 +57,14 @@ void Rollers::shoot_until_empty() {
   intaking = false;
   shoot();
   wait_until([=]() { return !is_in_lower() && !is_in_upper(); }, 3000);
-  wait(500);
+  wait(750);
+}
+
+void Rollers::shoot_and_outtake_until_empty() {
+  intaking = false;
+  shoot_and_outtake();
+  wait_until([=]() { return !is_in_lower() && !is_in_upper(); }, 3000);
+  wait(750);
 }
 
 void Rollers::shoot_and_outtake() {
@@ -93,6 +100,13 @@ void Rollers::slow_rollers(bool slow) {
     power = 400;
   else
     power = 600;
+}
+
+void Rollers::emergency_outtake() {
+  left_side.move_velocity(-600);
+  right_side.move_velocity(-600);
+  lower_shooter.move_velocity(-600);
+  upper_shooter.move_velocity(-600);
 }
 
 void Rollers::command(double side_cmd, double l_shooter_cmd) {
