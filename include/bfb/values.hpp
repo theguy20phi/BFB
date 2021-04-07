@@ -7,7 +7,7 @@ namespace port {
     constexpr int r_f_drive_motor{12};
     constexpr int r_b_drive_motor{18};
     constexpr int l_side_motor{2};
-    constexpr int r_side_motor{8};
+    constexpr int r_side_motor{19};
     constexpr int l_shooter_motor{10};
     constexpr int u_shooter_motor{9};
     constexpr char upper_line_tracker{'A'};
