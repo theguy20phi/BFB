@@ -94,9 +94,12 @@ void autonomous() {
     bfb::wait(250);
     rollers->standby();
     chassis->move_to({{0.0_tile, 0.0_tile, -135.0_deg}}, true, 1.625_s);
+    rollers->intake_two_balls();
     rollers->shoot_and_outtake_until_empty();
+    rollers->intake_one_ball();
     bfb::wait(100);
-    chassis->move_to({{2.0_tile, 2.0_tile, -135.0_deg}});
+    chassis->move_to({{2.0_tile, 2.0_tile, -135.0_deg}}, false, 3.0_s);
+    rollers->outtake_until_empty();
     break;
   case bfb::Routine::Right:
     chassis->set_pose({88.3_in, 10.414_in, 80.0_deg});
@@ -111,9 +114,12 @@ void autonomous() {
     bfb::wait(250);
     rollers->standby();
     chassis->move_to({{6.0_tile, 0.0_tile, 135.0_deg}}, true, 1.625_s);
+    rollers->intake_two_balls();
     rollers->shoot_and_outtake_until_empty();
+    rollers->intake_one_ball();
     bfb::wait(100);
-    chassis->move_to({{4.5_tile, 2.0_tile, 135.0_deg}});
+    chassis->move_to({{4.5_tile, 2.0_tile, 135.0_deg}}, false, 3.0_s);
+    rollers->outtake_until_empty();
     break;
   case bfb::Routine::Skills:
     chassis->set_pose({2.0_tile, 9.0_in, -90.0_deg});
