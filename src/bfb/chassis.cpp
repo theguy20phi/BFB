@@ -38,6 +38,8 @@ void Chassis::task_fn() {
     const okapi::QTime delta_t{time - previous_time};
     pose.v = previous_pose.distance_to(pose) / delta_t;
     pose.w = (pose.h - previous_pose.h) / delta_t;
+    pose = line_landmarker.correct_position(pose, line_sensor_triggered());
+    pose = goal_landmarker.correct_position(pose, goal_limit_switch.get_new_press());
     previous_time = time;
     previous_pose = pose;
     wait(general_delay);
