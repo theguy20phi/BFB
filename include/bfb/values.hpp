@@ -16,8 +16,8 @@ namespace port {
     constexpr char r_encoder{'C'};
     constexpr char s_encoder{'E'};
     constexpr int port_extender{3};
-    constexpr char center_line_tracker{1};
-    constexpr char goal_limit_switch{2};
-    constexpr char auton_selector_pot{3};
+    constexpr char center_line_tracker{'A'};
+    constexpr char goal_limit_switch{'B'};
+    constexpr char auton_selector_pot{'C'};
 }   
 }

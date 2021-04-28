@@ -39,38 +39,34 @@ class Chassis : public Task {
   pros::Motor r_f_wheel{port::r_f_drive_motor, true};
   pros::Motor r_b_wheel{port::r_b_drive_motor, true};
   const double deadband{500.0};
-  // TODO Tune these!
   PID lateral_pos_pid{{2750.0, 0.0, 42500}, make_settled_util(1.5, 0.5)};
   PID angular_pos_pid{{1500.0, 0.0, 3250}, make_settled_util(1.5, 0.5)};
   Pose pose{};
   Pose previous_pose{};
   okapi::QTime previous_time{0_ms};
-  Odometer l_odom{port::l_encoder, 6.9375_in, true};
-  Odometer r_odom{port::r_encoder, 6.9375_in, true};
-  Odometer s_odom{port::s_encoder, 5.725_in, true};
+  Odometer l_odom{port::l_encoder, 7.0_in, true};
+  Odometer r_odom{port::r_encoder, 7.0_in, true};
+  Odometer s_odom{port::s_encoder, 5.5_in, true};
   pros::ADILineSensor center_line_sensor{{port::port_extender, port::center_line_tracker}};
-  // TODO The threshold at which the line sensor triggers may be different.
   static constexpr int line_threshold{500};
-  // TODO May be normally closed instead of normally open
   pros::ADIDigitalIn goal_limit_switch{{port::port_extender, port::goal_limit_switch}};
   LineLandmarker line_landmarker{
-    {{{0.0_tile, 1.0_tile - 0.5_in}, {6.0_tile, 1.0_tile - 0.5_in}},
-     {{0.0_tile, 3.0_tile - 0.5_in}, {6.0_tile, 3.0_tile - 0.5_in}},
-     {{0.0_tile, 3.0_tile + 0.5_in}, {6.0_tile, 3.0_tile + 0.5_in}},
-     {{0.0_tile, 5.0_tile + 0.5_in}, {6.0_tile, 5.0_tile + 0.5_in}}},
+    {{{0.0_tile, 1.0_tile - 0.625_in}, {6.0_tile, 1.0_tile - 0.625_in}},
+     {{0.0_tile, 3.0_tile - 0.625_in}, {6.0_tile, 3.0_tile - 0.625_in}},
+     {{0.0_tile, 3.0_tile + 0.625_in}, {6.0_tile, 3.0_tile + 0.625_in}},
+     {{0.0_tile, 5.0_tile + 0.625_in}, {6.0_tile, 5.0_tile + 0.625_in}}},
     {{{2.5_tile, 1.5_tile}, {3.5_tile, 0.0_tile}}, {{2.5_tile, 4.5_tile}, {3.5_tile, 6.0_tile}}},
     0.5};
-  // TODO 9.0_in should be replaced with actual distance from front to center.
-  static constexpr okapi::QLength goal_radius{5.65_in + 5.75_in};
+  static constexpr okapi::QLength goal_radius{14.5_in};
   GoalLandmarker goal_landmarker{{{{3.0_tile, 3.0_tile}, goal_radius},
                                   {{5.65_in, 5.65_in}, goal_radius},
                                   {{3.0_tile, 5.65_in}, goal_radius},
                                   {{6.0_tile - 5.65_in, 5.65_in}, goal_radius},
-                                  {{5.65_in, 3.0_tile}, 5.65_in},
+                                  {{5.65_in, 3.0_tile}, goal_radius},
                                   {{6.0_tile - 5.65_in, 3.0_tile}, goal_radius},
                                   {{5.65_in, 6.0_tile - 5.65_in}, goal_radius},
                                   {{3.0_tile, 6.0_tile - 5.65_in}, goal_radius},
                                   {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}},
-                                 0.0};
+                                 0.75};
 };
 } // namespace bfb

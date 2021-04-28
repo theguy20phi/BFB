@@ -145,7 +145,6 @@ void autonomous() {
     rollers->standby();
     chassis->move_to({{0.0_tile, 3.0_tile, -90.0_deg}}, true, 5.0_s);
     rollers->shoot_until_empty();
-    chassis->set_pose({chassis->get_pose().x, chassis->get_pose().y, -90.0_deg});
     chassis->move_to(
       {{1.5_tile, 3.0_tile, -90.0_deg}, {1.5_tile, 3.0_tile, 0.0_deg}}, false, 5.0_s);
     rollers->intake();
@@ -166,7 +165,6 @@ void autonomous() {
     rollers->standby();
     chassis->move_to({{3.0_tile, 5.0_tile, 0.0_deg}, {3.0_tile, 6.0_tile, 0.0_deg}}, true, 5.0_s);
     rollers->shoot_until_empty();
-    chassis->set_pose({chassis->get_pose().x, chassis->get_pose().y, 0.0_deg});
     chassis->move_to({{3.0_tile, 5.0_tile, 0.0_deg}, {3.0_tile, 5.0_tile, 90.0_deg}}, false, 5.0_s);
     rollers->intake();
     chassis->move_to(
@@ -175,14 +173,15 @@ void autonomous() {
     chassis->move_to({{6.0_tile, 6.0_tile, 45.0_deg}}, true, 5.0_s);
     rollers->shoot_until_empty();
     chassis->move_to(
-      {{4.0_tile, 4.0_tile, 45.0_deg}, {4.0_tile, 4.0_tile, -180.0_deg}}, false, 5.0_s);
+      {{4.0_tile, 4.0_tile, 45.0_deg}, {4.0_tile, 4.0_tile, -180.0_deg}}, false, 3.0_s);
     rollers->intake();
     chassis->move_to(
       {{4.0_tile, 3.0_tile, -180.0_deg}, {4.0_tile, 3.0_tile, -90.0_deg}}, false, 5.0_s);
-    rollers->standby();
+    rollers->coerce(bfb::Direction::In);
     chassis->move_to({{3.0_tile, 3.0_tile, -90.0_deg}}, true, 5.0_s);
     rollers->shoot_until_empty();
     rollers->intake_one_ball();
+    rollers->coerce(bfb::Direction::Out);
     chassis->move_to({{4.0_tile, 3.0_tile, -90.0_deg}}, false, 5.0_s);
     rollers->shoot_and_outtake_until_empty();
     rollers->intake();
@@ -191,12 +190,15 @@ void autonomous() {
     rollers->standby();
     chassis->move_to({{6.0_tile, 3.0_tile, 90.0_deg}}, true, 5.0_s);
     rollers->shoot_until_empty();
-    chassis->set_pose({chassis->get_pose().x, chassis->get_pose().y, 90.0_deg});
     chassis->move_to(
       {{4.5_tile, 3.0_tile, 90.0_deg}, {4.5_tile, 3.0_tile, -180.0_deg}}, false, 5.0_s);
     rollers->intake();
-    chassis->move_to(
-      {{4.5_tile, 1.0_tile, -180.0_deg}, {5.0_tile, 1.0_tile, 135.0_deg}}, false, 5.0_s);
+    chassis->move_to({{4.5_tile, 1.0_tile, -180.0_deg},
+                      {4.5_tile, 1.0_tile, 90.0_deg},
+                      {5.0_tile, 1.0_tile, 90.0_deg},
+                      {5.0_tile, 1.0_tile, 135.0_deg}},
+                     false,
+                     5.0_s);
     rollers->standby();
     chassis->move_to({{6.0_tile, 0.0_tile, 135.0_deg}}, true, 5.0_s);
     rollers->shoot_until_empty();

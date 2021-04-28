@@ -6,6 +6,11 @@
 #include "wait.hpp"
 
 namespace bfb {
+enum class Direction {
+  In,
+  Out
+};
+
 class Rollers : public Task {
   public:
   Rollers();
@@ -23,6 +28,7 @@ class Rollers : public Task {
   void intake_two_balls();
   void toggle_shooter();
   void slow_rollers(bool slow);
+  void coerce(const Direction &dir);
   void emergency_outtake();
 
   private:

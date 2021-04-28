@@ -98,19 +98,16 @@ Circle GoalLandmarker::get_closest_goal(const Pose &current) const {
 Point GoalLandmarker::get_closest_point(const Pose &current, const Circle &closest_goal) const {
   const okapi::QLength x_diff{current.x - closest_goal.center.x};
   const okapi::QLength y_diff{current.y - closest_goal.center.y};
-  const okapi::QLength x{closest_goal.center.x +
-                         closest_goal.radius *
-                           (x_diff / okapi::sqrt(x_diff * x_diff + y_diff * y_diff))};
-  const okapi::QLength y{closest_goal.center.y +
-                         closest_goal.radius *
-                           (y_diff / okapi::sqrt(x_diff * x_diff + y_diff * y_diff))};
-  return Point{x, y, current.h};
+  const okapi::QAngle h{90.0_deg - okapi::atan2(y_diff, x_diff) - 180.0_deg};
+  const okapi::QLength x{closest_goal.center.x + closest_goal.radius * okapi::cos(270.0_deg - h)};
+  const okapi::QLength y{closest_goal.center.y + closest_goal.radius * okapi::sin(270.0_deg - h)};
+  return Point{x, y, h};
 }
 
 Pose GoalLandmarker::weight(const Pose &current, const Point &proposed) const {
   return Pose{current.x * comp_probability + proposed.x * probability,
               current.y * comp_probability + proposed.y * probability,
-              current.h * comp_probability + proposed.h * probability,
+              current.h,
               current.v,
               current.w};
 }

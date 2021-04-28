@@ -102,6 +102,13 @@ void Rollers::slow_rollers(bool slow) {
     power = 600;
 }
 
+void Rollers::coerce(const Direction &dir) {
+  if(dir == Direction::In)
+    command(100, 0);
+  else
+    command(-100, 0);
+}
+
 void Rollers::emergency_outtake() {
   left_side.move_velocity(-600);
   right_side.move_velocity(-600);

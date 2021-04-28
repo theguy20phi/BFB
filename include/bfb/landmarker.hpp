@@ -2,6 +2,9 @@
 
 #include "geometry.hpp"
 #include <vector>
+#include <iostream>
+
+using namespace okapi::literals;
 
 namespace bfb {
 class LineLandmarker {
@@ -26,7 +29,7 @@ class LineLandmarker {
 
 class GoalLandmarker {
   public:
-  GoalLandmarker(const std::vector<Circle> &i_goals, const double i_probability = 1.0);
+  GoalLandmarker(const std::vector<Circle> &i_goals, double i_probability = 1.0);
   Pose correct_position(const Pose &current, bool signal) const;
 
   private:
@@ -36,6 +39,7 @@ class GoalLandmarker {
 
   private:
   const std::vector<Circle> goals;
+  const okapi::QLength distance_to;
   const double probability;
   const double comp_probability;
 };
