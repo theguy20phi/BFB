@@ -148,7 +148,7 @@ void autonomous() {
     chassis->move_to(
       {{1.5_tile, 3.0_tile, -90.0_deg}, {1.5_tile, 3.0_tile, 0.0_deg}}, false, 5.0_s);
     rollers->intake();
-    chassis->move_to({{1.5_tile, 5.0_tile, 0.0_deg},
+    chassis->move_to({{1.5_tile, 4.0_tile, 0.0_deg},
                       {1.5_tile, 5.0_tile, 0.0_deg},
                       {1.5_tile, 5.0_tile, -90.0_deg},
                       {1.0_tile, 5.0_tile, -90.0_deg},

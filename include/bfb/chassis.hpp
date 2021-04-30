@@ -56,7 +56,7 @@ class Chassis : public Task {
      {{0.0_tile, 3.0_tile + 0.625_in}, {6.0_tile, 3.0_tile + 0.625_in}},
      {{0.0_tile, 5.0_tile + 0.625_in}, {6.0_tile, 5.0_tile + 0.625_in}}},
     {{{2.5_tile, 1.5_tile}, {3.5_tile, 0.0_tile}}, {{2.5_tile, 4.5_tile}, {3.5_tile, 6.0_tile}}},
-    0.5};
+    0.625};
   static constexpr okapi::QLength goal_radius{14.5_in};
   GoalLandmarker goal_landmarker{{{{3.0_tile, 3.0_tile}, goal_radius},
                                   {{5.65_in, 5.65_in}, goal_radius},
@@ -67,6 +67,6 @@ class Chassis : public Task {
                                   {{5.65_in, 6.0_tile - 5.65_in}, goal_radius},
                                   {{3.0_tile, 6.0_tile - 5.65_in}, goal_radius},
                                   {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}},
-                                 0.75};
+                                 0.7};
 };
 } // namespace bfb
