@@ -38,14 +38,14 @@ class Chassis : public Task {
   pros::Motor l_b_wheel{port::l_b_drive_motor};
   pros::Motor r_f_wheel{port::r_f_drive_motor, true};
   pros::Motor r_b_wheel{port::r_b_drive_motor, true};
-  const double deadband{500.0};
+  const double deadband{2000.0};
   PID lateral_pos_pid{{2750.0, 0.0, 42500}, make_settled_util(1.5, 0.5)};
   PID angular_pos_pid{{1500.0, 0.0, 3250}, make_settled_util(1.5, 0.5)};
   Pose pose{};
   Pose previous_pose{};
   okapi::QTime previous_time{0_ms};
-  Odometer l_odom{port::l_encoder, 7.0_in, true};
-  Odometer r_odom{port::r_encoder, 7.0_in, true};
+  Odometer l_odom{port::l_encoder, 7.0703125_in, true};
+  Odometer r_odom{port::r_encoder, 7.0703125_in, true};
   Odometer s_odom{port::s_encoder, 5.5_in, true};
   pros::ADILineSensor center_line_sensor{{port::port_extender, port::center_line_tracker}};
   static constexpr int line_threshold{500};
@@ -67,6 +67,6 @@ class Chassis : public Task {
                                   {{5.65_in, 6.0_tile - 5.65_in}, goal_radius},
                                   {{3.0_tile, 6.0_tile - 5.65_in}, goal_radius},
                                   {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}},
-                                 0.7};
+                                 0.675};
 };
 } // namespace bfb

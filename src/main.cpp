@@ -182,7 +182,7 @@ void autonomous() {
     rollers->shoot_until_empty();
     rollers->intake_one_ball();
     rollers->coerce(bfb::Direction::Out);
-    chassis->move_to({{4.0_tile, 3.0_tile, -90.0_deg}}, false, 5.0_s);
+    chassis->move_to({{5.0_tile, 3.0_tile, -90.0_deg}}, false, 1.5_s);
     rollers->shoot_and_outtake_until_empty();
     rollers->intake();
     chassis->move_to(
