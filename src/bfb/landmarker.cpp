@@ -107,7 +107,7 @@ Point GoalLandmarker::get_closest_point(const Pose &current, const Circle &close
 Pose GoalLandmarker::weight(const Pose &current, const Point &proposed) const {
   return Pose{current.x * comp_probability + proposed.x * probability,
               current.y * comp_probability + proposed.y * probability,
-              current.h * comp_probability + proposed.h * probability,
+              current.h,
               current.v,
               current.w};
 }

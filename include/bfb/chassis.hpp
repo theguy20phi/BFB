@@ -46,7 +46,7 @@ class Chassis : public Task {
   okapi::QTime previous_time{0_ms};
   Odometer l_odom{port::l_encoder, 7.0703125_in, true};
   Odometer r_odom{port::r_encoder, 7.0703125_in, true};
-  Odometer s_odom{port::s_encoder, 5.5_in, true};
+  Odometer s_odom{port::s_encoder, 5.5625_in, true};
   pros::ADILineSensor center_line_sensor{{port::port_extender, port::center_line_tracker}};
   static constexpr int line_threshold{500};
   pros::ADIDigitalIn goal_limit_switch{{port::port_extender, port::goal_limit_switch}};
@@ -67,6 +67,6 @@ class Chassis : public Task {
                                   {{5.65_in, 6.0_tile - 5.65_in}, goal_radius},
                                   {{3.0_tile, 6.0_tile - 5.65_in}, goal_radius},
                                   {{6.0_tile - 5.65_in, 6.0_tile - 5.65_in}, goal_radius}},
-                                 0.675};
+                                 0.5};
 };
 } // namespace bfb
